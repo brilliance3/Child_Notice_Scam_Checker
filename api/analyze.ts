@@ -3,9 +3,29 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import type { AnalyzeRequest } from '../src/types/analysis.ts';
 import { runAnalyze } from '../src/server/runAnalyze.ts';
 
+function coerceJsonBody(body: unknown): unknown {
+  if (body == null) return null;
+  if (Buffer.isBuffer(body)) {
+    try {
+      return JSON.parse(body.toString('utf8')) as unknown;
+    } catch {
+      return null;
+    }
+  }
+  if (typeof body === 'string') {
+    try {
+      return JSON.parse(body) as unknown;
+    } catch {
+      return null;
+    }
+  }
+  return body;
+}
+
 function readMessage(body: unknown): string | null {
-  if (!body || typeof body !== 'object') return null;
-  const msg = (body as AnalyzeRequest).message;
+  const parsed = coerceJsonBody(body);
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null;
+  const msg = (parsed as AnalyzeRequest).message;
   if (typeof msg !== 'string') return null;
   const trimmed = msg.trim();
   return trimmed.length ? trimmed : null;
@@ -24,10 +44,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    const openAiApiKey = process.env.OPENAI_API_KEY;
+    const openAiApiKey = process.env.OPENAI_API_KEY?.trim() || undefined;
     const result = await runAnalyze(message, openAiApiKey);
     res.status(200).json(result);
-  } catch {
+  } catch (err) {
+    console.error('[api/analyze]', err);
     res.status(500).json({ error: '분석 중 오류가 발생했습니다.' });
   }
 }

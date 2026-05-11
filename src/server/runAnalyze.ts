@@ -111,6 +111,7 @@ async function callOpenAi(params: {
   scamType: string;
   ruleReasons: string[];
 }): Promise<AiAnalyzePayload | null> {
+  try {
   const system = [
     'You are a phishing and smishing risk analysis assistant for Korean parents.',
     '',
@@ -171,6 +172,10 @@ async function callOpenAi(params: {
   const content = data.choices?.[0]?.message?.content;
   if (!content) return null;
   return safeJsonParse(content);
+  } catch (e) {
+    console.error('[callOpenAi]', e);
+    return null;
+  }
 }
 
 export async function runAnalyze(rawMessage: string, openAiApiKey?: string): Promise<AnalyzeResult> {
@@ -194,14 +199,19 @@ export async function runAnalyze(rawMessage: string, openAiApiKey?: string): Pro
   let riskSummary = buildFallbackSummary(riskScore, riskLevel, scamType);
 
   if (openAiApiKey) {
-    const ai = await callOpenAi({
-      apiKey: openAiApiKey,
-      message,
-      riskScore,
-      urls,
-      scamType,
-      ruleReasons,
-    });
+    let ai: Awaited<ReturnType<typeof callOpenAi>> = null;
+    try {
+      ai = await callOpenAi({
+        apiKey: openAiApiKey,
+        message,
+        riskScore,
+        urls,
+        scamType,
+        ruleReasons,
+      });
+    } catch (e) {
+      console.error('[runAnalyze] OpenAI 단계', e);
+    }
     if (ai) {
       if (typeof ai.riskSummary === 'string' && ai.riskSummary.trim()) {
         riskSummary = ai.riskSummary.trim();
