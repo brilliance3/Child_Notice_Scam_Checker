@@ -1,5 +1,5 @@
 // 프론트엔드에서 분석 API(/api/analyze)를 호출하는 클라이언트
-import type { AnalyzeRequest, AnalyzeResult } from '../types/analysis';
+import type { AnalyzeRequest, AnalyzeResult } from '../../lib/types/analysis';
 
 export async function analyzeMessage(payload: AnalyzeRequest): Promise<AnalyzeResult> {
   const res = await fetch('/api/analyze', {

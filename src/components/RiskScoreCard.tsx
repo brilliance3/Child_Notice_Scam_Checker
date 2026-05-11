@@ -1,5 +1,5 @@
 // 규칙·AI 요약을 바탕으로 위험도 점수와 단계를 카드 UI로 표시한다
-import type { AnalyzeResult } from '../types/analysis';
+import type { AnalyzeResult } from '../../lib/types/analysis';
 
 const levelStyle: Record<
   AnalyzeResult['riskLevel'],

@@ -1,5 +1,5 @@
 // 추출된 URL 목록과 주요 위험 요인 불릿 리스트를 렌더링한다
-import type { AnalyzeResult } from '../types/analysis';
+import type { AnalyzeResult } from '../../lib/types/analysis';
 
 type Props = {
   result: AnalyzeResult;

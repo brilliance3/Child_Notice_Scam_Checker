@@ -112,66 +112,66 @@ async function callOpenAi(params: {
   ruleReasons: string[];
 }): Promise<AiAnalyzePayload | null> {
   try {
-  const system = [
-    'You are a phishing and smishing risk analysis assistant for Korean parents.',
-    '',
-    'Your task is to analyze suspicious Korean SMS messages related to schools, academies, childcare, meal payments, field trips, after-school classes, and child-related notices.',
-    '',
-    'You must:',
-    '1. Explain the risk in simple Korean.',
-    '2. Never say that the message is 100% safe.',
-    '3. Recommend not clicking suspicious links.',
-    '4. Suggest verifying through official school, academy, or teacher contact channels.',
-    '5. Avoid causing excessive panic.',
-    '6. Return structured JSON only.',
-  ].join('\n');
+    const system = [
+      'You are a phishing and smishing risk analysis assistant for Korean parents.',
+      '',
+      'Your task is to analyze suspicious Korean SMS messages related to schools, academies, childcare, meal payments, field trips, after-school classes, and child-related notices.',
+      '',
+      'You must:',
+      '1. Explain the risk in simple Korean.',
+      '2. Never say that the message is 100% safe.',
+      '3. Recommend not clicking suspicious links.',
+      '4. Suggest verifying through official school, academy, or teacher contact channels.',
+      '5. Avoid causing excessive panic.',
+      '6. Return structured JSON only.',
+    ].join('\n');
 
-  const user = [
-    'Analyze the following message.',
-    '',
-    `Message:\n${params.message}`,
-    '',
-    `Rule-based score:\n${params.riskScore}`,
-    '',
-    `Detected URLs:\n${params.urls.join(', ') || '(none)'}`,
-    '',
-    `Scam type:\n${params.scamType}`,
-    '',
-    'Rule-based hints:',
-    ...params.ruleReasons.map((r) => `- ${r}`),
-    '',
-    'Return JSON with keys:',
-    '- riskSummary (string, one short paragraph in Korean)',
-    '- riskReasons (string array, max 6 items, Korean)',
-    '- recommendedActions (string array, max 6 items, Korean)',
-    '- confirmationMessage (string, Korean, polite template parents can send)',
-    '- reportText (string, Korean multi-line report similar to a police/portal report summary)',
-  ].join('\n');
+    const user = [
+      'Analyze the following message.',
+      '',
+      `Message:\n${params.message}`,
+      '',
+      `Rule-based score:\n${params.riskScore}`,
+      '',
+      `Detected URLs:\n${params.urls.join(', ') || '(none)'}`,
+      '',
+      `Scam type:\n${params.scamType}`,
+      '',
+      'Rule-based hints:',
+      ...params.ruleReasons.map((r) => `- ${r}`),
+      '',
+      'Return JSON with keys:',
+      '- riskSummary (string, one short paragraph in Korean)',
+      '- riskReasons (string array, max 6 items, Korean)',
+      '- recommendedActions (string array, max 6 items, Korean)',
+      '- confirmationMessage (string, Korean, polite template parents can send)',
+      '- reportText (string, Korean multi-line report similar to a police/portal report summary)',
+    ].join('\n');
 
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${params.apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o-mini',
-      temperature: 0.4,
-      response_format: { type: 'json_object' },
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: user },
-      ],
-    }),
-  });
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${params.apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        temperature: 0.4,
+        response_format: { type: 'json_object' },
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: user },
+        ],
+      }),
+    });
 
-  if (!res.ok) return null;
-  const data = (await res.json()) as {
-    choices?: Array<{ message?: { content?: string } }>;
-  };
-  const content = data.choices?.[0]?.message?.content;
-  if (!content) return null;
-  return safeJsonParse(content);
+    if (!res.ok) return null;
+    const data = (await res.json()) as {
+      choices?: Array<{ message?: { content?: string } }>;
+    };
+    const content = data.choices?.[0]?.message?.content;
+    if (!content) return null;
+    return safeJsonParse(content);
   } catch (e) {
     console.error('[callOpenAi]', e);
     return null;

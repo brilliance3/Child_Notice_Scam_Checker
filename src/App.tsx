@@ -7,8 +7,8 @@ import { Header } from './components/Header';
 import { InputBox } from './components/InputBox';
 import { RiskReasonList } from './components/RiskReasonList';
 import { RiskScoreCard } from './components/RiskScoreCard';
-import { extractUrls } from './utils/extractUrls';
-import type { AnalyzeResult } from './types/analysis';
+import type { AnalyzeResult } from '../lib/types/analysis';
+import { extractUrls } from '../lib/utils/extractUrls';
 
 function IntroCard() {
   return (

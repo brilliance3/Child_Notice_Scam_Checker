@@ -1,5 +1,5 @@
 // 보호자가 취할 권장 행동을 순서 있는 목록으로 안내한다
-import type { AnalyzeResult } from '../types/analysis';
+import type { AnalyzeResult } from '../../lib/types/analysis';
 
 type Props = {
   result: AnalyzeResult;

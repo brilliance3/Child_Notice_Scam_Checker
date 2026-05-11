@@ -1,7 +1,7 @@
 // Vercel Serverless: 문자 분석 요청을 받아 규칙·AI 기반 결과를 JSON으로 반환한다
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import type { AnalyzeRequest } from '../src/types/analysis.ts';
-import { runAnalyze } from '../src/server/runAnalyze.ts';
+import type { AnalyzeRequest } from '../lib/types/analysis.ts';
+import { runAnalyze } from '../lib/server/runAnalyze.ts';
 
 function coerceJsonBody(body: unknown): unknown {
   if (body == null) return null;
